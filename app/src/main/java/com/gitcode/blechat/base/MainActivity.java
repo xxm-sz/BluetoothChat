@@ -4,6 +4,7 @@ import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -59,10 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothLeScanner scanner;
 
     private BluetoothDevice selectedDevice;
-
-    private Callback callback;
-
-    private BluetoothGatt gatt;
 
     public static final int REQUEST_ACCESS_COARSE_LOCATION_PERMISSION = 100;
 
@@ -143,8 +140,12 @@ public class MainActivity extends AppCompatActivity {
     private void isSupportBle() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        BluetoothManager manager= (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+
+        mBluetoothAdapter= manager.getAdapter();
+
         if (mBluetoothAdapter == null
-                || !getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                || !getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
             showNotSupportBluetoothDialog();
             Log.e(TAG, "not support bluetooth");
         } else {
@@ -265,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     private void beDiscovered() {
         if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
             startActivity(discoverableIntent);
         }
     }
